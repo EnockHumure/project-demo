@@ -1,49 +1,6 @@
 # Patient Disease Tracking & Analytics System (PDTAS)
 
-## 📋 Project Navigation Guide
-
-### **Personal Information**
-- Student Identification
-- Academic Details
-
-### **Project Overview**
-- System Introduction
-- Scope and Purpose
-
-### **Problem Analysis**
-- Current Challenges
-- Research Question
-
-### **Solution Architecture**
-- System Solution
-- Technical Approach
-
-### **Implementation Context**
-- Usage Environment
-- Target User Groups
-
-### **Project Objectives**
-- Primary Goals
-- Success Metrics
-
-### **Business Intelligence Potential**
-- Analytics Capabilities
-- Dashboard Features
-
-### **Development Framework**
-- Project Phases Overview
-- Phase-by-Phase Breakdown
-
-### **Delivery Requirements**
-- Submission Guidelines
-- Quality Standards
-
-### **Support & Resources**
-- Contact Information
-- Documentation
-
----
-
+================================================================================================
 ## 🎓 Personal Information
 
 **Student:** Humure Enock  
@@ -100,7 +57,7 @@ This is a multi-phase individual capstone project centered on Oracle database de
 
 ## 📚 Development Framework
 
-### **Project Phases Overview**
+### **Project Phases table of content **
 
 | Phase | Primary Objective | Key Deliverable |
 |-------|-------------------|-----------------|
@@ -121,18 +78,4 @@ This is a multi-phase individual capstone project centered on Oracle database de
 - **Institution:** Adventist University of Central Africa (AUCA)  
 - **Project Completion Date:** December 7, 2025
 
-**Critical Submission Rules:**
-1. **Strict Deadlines** → Late submissions receive zero points
-2. **Individual Work** → Original work only, no copying
-3. **GitHub Required** → All code tracked via GitHub
-4. **Quality Standards** → Production-ready code expected
-5. **Screenshot Proof** → Project name must be visible
 
-## 📞 Support & Resources
-
-**Lecturer:** Eric Maniraguha  
-**Email:** eric.maniraguha@auca.ac.rw
-
----
-
-*Note: This README documents the capstone project requirements and specifications. All project phases must be completed according to the outlined framework.*
