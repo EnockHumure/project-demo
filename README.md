@@ -479,14 +479,220 @@ Password: humure
 ---
 
 **Phase:** IV - Database Creation  
+
+
+
+# Phase V: Table Implementation & Data Verification
+
+## 🎯 Objective
+Verify the successful creation of all database tables, data integrity, and proper implementation of the Patient Disease Tracking & Analytics System schema.
+
+## 📋 Table Structure Verification
+
+### **Tables Created (7 Total):**
+| Table Name | Purpose | Row Count |
+|------------|---------|-----------|
+| `MAIN_DISEASES` | Priority disease definitions | 5 |
+| `OTHER_DISEASES` | Non-priority disease definitions | 3 |
+| `RECEPTION` | Patient registration data | 5 |
+| `DOCTOR` | Healthcare provider information | 5 |
+| `LAB_TECHNICIAN` | Laboratory test records | 5 |
+| `TREATMENT` | Medication and treatment history | 5 |
+| `DISEASE_STATS` | Analytics and disease metrics | 5 |
+
+## 🔍 Validation Script Results
+
+### **1. Table Existence Check**
+```sql
+SELECT table_name 
+FROM user_tables
+WHERE table_name IN (
+    'MAIN_DISEASES',
+    'OTHER_DISEASES',
+    'RECEPTION',
+    'DOCTOR',
+    'LAB_TECHNICIAN',
+    'TREATMENT',
+    'DISEASE_STATS'
+);
+```
+**Expected Result:** All 7 tables should be listed.
+
+### **2. Column Structure Verification**
+```sql
+SELECT column_name, data_type, nullable
+FROM user_tab_columns
+WHERE table_name = 'RECEPTION';
+```
+**Expected Result:** Should show columns: `patient_id`, `first_name`, `last_name`, `gender`, `date_of_birth`, `phone_number`, `email`, `address`, `disease_name`, `visit_date`, `doctor_id`, `lab_technician_id`, `treatment_id`.
+
+### **3. Constraint Validation**
+```sql
+SELECT constraint_name, constraint_type, table_name
+FROM user_constraints
+WHERE table_name IN (
+    'RECEPTION',
+    'LAB_TECHNICIAN',
+    'TREATMENT',
+    'DOCTOR',
+    'DISEASE_STATS'
+);
+```
+**Expected Result:** Should show PRIMARY KEY and FOREIGN KEY constraints for each table.
+
+### **4. Data Volume Verification**
+```sql
+SELECT COUNT(*) AS main_diseases_count FROM main_diseases;        -- Expected: 5
+SELECT COUNT(*) AS other_diseases_count FROM other_diseases;     -- Expected: 3
+SELECT COUNT(*) AS reception_count FROM reception;               -- Expected: 5
+SELECT COUNT(*) AS doctor_count FROM doctor;                     -- Expected: 5
+SELECT COUNT(*) AS lab_technician_count FROM lab_technician;     -- Expected: 5
+SELECT COUNT(*) AS treatment_count FROM treatment;               -- Expected: 5
+SELECT COUNT(*) AS disease_stats_count FROM disease_stats;       -- Expected: 5
+```
+
+## 🔗 Foreign Key Integrity Tests
+
+### **1. Orphan Lab Tests Check**
+```sql
+SELECT *
+FROM lab_technician l
+WHERE NOT EXISTS (
+    SELECT 1 FROM reception r WHERE r.patient_id = l.patient_id
+);
+```
+**Expected Result:** 0 rows (no orphan records)
+
+### **2. Orphan Treatment Records Check**
+```sql
+SELECT *
+FROM treatment t
+WHERE NOT EXISTS (
+    SELECT 1 FROM reception r WHERE r.patient_id = t.patient_id
+);
+```
+**Expected Result:** 0 rows (no orphan records)
+
+## 📊 Sample Data Queries
+
+### **1. Patient Data Retrieval**
+```sql
+-- View all patients
+SELECT * FROM reception;
+
+-- Expected: 5 rows with Rwandan patient names and diseases
+```
+
+### **2. Lab Tests with Patient Information**
+```sql
+SELECT r.first_name, r.last_name, l.test_type, l.test_result, l.lab_technician_name
+FROM reception r
+JOIN lab_technician l ON r.patient_id = l.patient_id;
+
+-- Expected: 5 rows showing patient names with their lab test results
+```
+
+### **3. Treatment Records with Patient Information**
+```sql
+SELECT r.first_name, r.last_name, t.medication, t.dosage, t.pharmacist_name
+FROM reception r
+JOIN treatment t ON r.patient_id = t.patient_id;
+
+-- Expected: 5 rows showing prescribed medications for each patient
+```
+
+## 📈 Analytics Queries
+
+### **1. Disease Distribution Analysis**
+```sql
+SELECT disease_name, COUNT(*) AS patient_count
+FROM reception
+GROUP BY disease_name;
+
+-- Expected: 5 rows, one for each main disease with patient counts
+```
+
+### **2. Hospital Location Statistics**
+```sql
+SELECT hospital_location, disease_name, SUM(patient_count) AS total_patients
+FROM disease_stats
+GROUP BY hospital_location, disease_name;
+
+-- Expected: Shows disease statistics by hospital location
+```
+
+## 🔍 Edge Case Tests
+
+### **1. Patients Without Lab Tests**
+```sql
+SELECT first_name, last_name
+FROM reception r
+WHERE patient_id IN (SELECT patient_id FROM treatment)
+  AND patient_id NOT IN (SELECT patient_id FROM lab_technician);
+
+-- Expected: Should identify any inconsistencies in data flow
+```
+
+### **2. Disease Classification Validation**
+```sql
+SELECT r.first_name, r.last_name, r.disease_name
+FROM reception r
+WHERE r.disease_name NOT IN (SELECT disease_name FROM main_diseases);
+
+-- Expected: Should return 0 rows (all diseases should be in main_diseases)
+-- Note: This assumes all patients have main diseases. For other diseases, this query would need adjustment.
+```
+
+## 📊 Dashboard-Ready Queries
+
+### **Top Diseases by Patient Count**
+```sql
+SELECT disease_name, COUNT(*) AS patient_count
+FROM reception
+GROUP BY disease_name
+ORDER BY patient_count DESC;
+
+-- Expected: List of main diseases sorted by number of patients
+```
+
+## ✅ Validation Summary
+
+### **Pass/Fail Criteria:**
+- [ ] **Table Creation:** All 7 tables exist
+- [ ] **Data Insertion:** All tables have sample data (5 rows each minimum)
+- [ ] **Foreign Keys:** No orphan records found
+- [ ] **Basic Queries:** All SELECT queries return expected results
+- [ ] **JOIN Operations:** All joins work correctly
+- [ ] **Aggregations:** GROUP BY queries calculate correctly
+- [ ] **Subqueries:** Complex queries execute without errors
+
+### **Execution Instructions:**
+1. Connect to the PDB: `WED_27394_ENOCK_PDTAS_DB`
+2. Run as user: `patient_track`
+3. Execute the validation script in SQL Developer or SQL*Plus
+4. Verify all expected results match
+
+## 📁 Files for Submission
+
+### **Phase V Scripts:**
+- `phase5_create_tables.sql` - Table creation script
+- `phase5_insert_data.sql` - Data insertion script
+- `phase5_validation.sql` - This validation script
+- `README.md` - This documentation
+
+### **Expected Output Files:**
+- Screenshot of table creation success
+- Screenshot of data insertion results
+- Screenshot of validation script execution
+- Screenshot of sample query results
+
+---
+
+**Phase:** V - Table Implementation & Data Insertion  
 **Status:** ✅ Completed  
-**PDB:** WED_27394_ENOCK_PDTAS_DB  
-**Next Phase:** V - Table Implementation & Data Insertion  
-**Submission Ready:** SQL scripts + documentation + screenshots
-
-
-
-
+**Database:** WED_27394_ENOCK_PDTAS_DB  
+**User:** patient_track  
+**Next Phase:** VI - PL/SQL Development
 
 
 
