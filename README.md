@@ -257,7 +257,232 @@ AUDIT READINESS: Audit trail framework defined
 **Phase:** III - Logical Model Design  
 **Status:** ✅ Completed  
 **Compliance:** 3NF + BI Optimized  
-**Next Phase:** IV - Database Creation (PDB + Tablespaces)
+
+# Phase IV: Database Creation
+
+## 🎯 Objective
+Create and configure the Oracle pluggable database for the Patient Disease Tracking & Analytics System with proper tablespace management and user setup.
+
+## 📁 Database Setup
+
+### **Naming Convention (As Required)**
+- **Group:** Wednesday (WED)
+- **Student ID:** 27394
+- **First Name:** Enock
+- **Project Name:** Patient Disease Tracking & Analytics System (PDTAS)
+
+**Final PDB Name:** `WED_27394_ENOCK_PDTAS_DB`
+
+### **Administrative Configuration**
+| Component | Value | Purpose |
+|-----------|-------|---------|
+| **Admin Username** | `enock_admin` | Super administrator for the PDB |
+| **Admin Password** | `humure` | Student's first name as required |
+| **Admin Privileges** | DBA role | Full administrative control |
+| **Application User** | `patient_track` | Application-level database user |
+| **Application Password** | `humure` | Same as admin for simplicity |
+
+## ⚙️ Database Configuration
+
+### **Tablespace Configuration**
+| Tablespace | Type | Size | Autoextend | Purpose |
+|------------|------|------|------------|---------|
+| `pdta_data` | Data | 50MB | ON (Next 10M, Max 500M) | Stores all table data |
+| `pdta_index` | Index | 20MB | ON (Next 5M, Max 200M) | Stores indexes for performance |
+| `pdta_temp` | Temporary | 20MB | ON (Next 5M, Max 100M) | Temporary operations space |
+
+### **Memory Parameters**
+| Parameter | Value | Justification |
+|-----------|-------|---------------|
+| **SGA** | Oracle XE Default | Limited by Oracle Express Edition |
+| **PGA** | Oracle XE Default | Limited by Oracle Express Edition |
+| **Total Memory** | As per XE limits | 2GB total for Oracle XE 21c |
+
+**Note:** Oracle Express Edition has memory limitations. Production deployment would require tuning.
+
+### **Archive Logging Status**
+```
+STATUS: DISABLED (Oracle XE Limitation)
+REASON: Oracle Express Edition does not support archive logging
+WORKAROUND: Regular backups via RMAN or data export
+```
+
+### **Autoextend Parameters**
+- **All tablespaces:** AUTOEXTEND ON
+- **Data growth:** Managed with NEXT and MAXSIZE parameters
+- **Monitoring:** Regular space usage checks required
+
+## 📜 SQL Implementation Scripts
+
+### **1. Database Creation Script (`phase4_create_pdb.sql`)**
+```sql
+-- Phase IV: Database Creation for PDTAS
+-- Student: Humure Enock (ID: 27394)
+-- Group: Wednesday (C)
+-- Date: December 2024
+
+-- Step 1: Create Pluggable Database
+CREATE PLUGGABLE DATABASE WED_27394_ENOCK_PDTAS_DB
+  ADMIN USER enock_admin IDENTIFIED BY humure
+  ROLES = (DBA)
+  FILE_NAME_CONVERT = (
+    'C:\dbms_oracle\oradata\XE\pdbseed\',
+    'C:\dbms_oracle\oradata\XE\WED_27394_ENOCK_PDTAS_DB\'
+  );
+
+-- Step 2: Open PDB
+ALTER PLUGGABLE DATABASE WED_27394_ENOCK_PDTAS_DB OPEN;
+ALTER PLUGGABLE DATABASE WED_27394_ENOCK_PDTAS_DB SAVE STATE;
+
+-- Step 3: Switch to PDB
+ALTER SESSION SET CONTAINER = WED_27394_ENOCK_PDTAS_DB;
+
+-- Step 4: Create Tablespaces
+CREATE TABLESPACE pdta_data 
+DATAFILE 'C:\dbms_oracle\oradata\XE\WED_27394_ENOCK_PDTAS_DB\pdta_data01.dbf'
+SIZE 50M AUTOEXTEND ON NEXT 10M MAXSIZE 500M;
+
+CREATE TABLESPACE pdta_index
+DATAFILE 'C:\dbms_oracle\oradata\XE\WED_27394_ENOCK_PDTAS_DB\pdta_index01.dbf'
+SIZE 20M AUTOEXTEND ON NEXT 5M MAXSIZE 200M;
+
+CREATE TEMPORARY TABLESPACE pdta_temp
+TEMPFILE 'C:\dbms_oracle\oradata\XE\WED_27394_ENOCK_PDTAS_DB\pdta_temp01.dbf'
+SIZE 20M AUTOEXTEND ON NEXT 5M MAXSIZE 100M;
+
+-- Step 5: Create Application User
+CREATE USER patient_track IDENTIFIED BY humure
+DEFAULT TABLESPACE pdta_data
+TEMPORARY TABLESPACE pdta_temp
+QUOTA UNLIMITED ON pdta_data;
+
+GRANT CONNECT, RESOURCE, DBA TO patient_track;
+
+-- Verification Queries
+SELECT name, open_mode FROM v$pdbs;
+SELECT tablespace_name, status FROM dba_tablespaces;
+SELECT username, account_status FROM dba_users;
+```
+
+### **2. Verification Script (`phase4_verify.sql`)**
+```sql
+-- Verify PDB Status
+SELECT name, open_mode, con_id FROM v$pdbs WHERE name = 'WED_27394_ENOCK_PDTAS_DB';
+
+-- Verify Tablespaces
+SELECT tablespace_name, status, contents, extent_management 
+FROM dba_tablespaces 
+WHERE tablespace_name LIKE 'PDTA%';
+
+-- Verify Users
+SELECT username, account_status, default_tablespace, temporary_tablespace
+FROM dba_users 
+WHERE username IN ('ENOCK_ADMIN', 'PATIENT_TRACK');
+
+-- Verify Datafiles
+SELECT file_name, tablespace_name, bytes/1024/1024 as size_mb, autoextensible
+FROM dba_data_files 
+WHERE tablespace_name LIKE 'PDTA%';
+```
+
+## 👥 User Setup Documentation
+
+### **Administrative User (`enock_admin`)**
+```sql
+-- Privileges: Full DBA rights
+-- Purpose: Database administration, user management, backup/restore
+-- Security: Strong password required in production
+```
+
+### **Application User (`patient_track`)**
+```sql
+-- Privileges: CONNECT, RESOURCE, DBA (for development)
+-- Purpose: Application data operations (Phase V-VII)
+-- Default Tablespace: pdta_data
+-- Temporary Tablespace: pdta_temp
+```
+
+
+## 🔒 Security Considerations
+
+### **Production Recommendations:**
+1. **Password Policy:** Strong passwords (12+ chars, mixed case, numbers, symbols)
+2. **Role Separation:** Application user should not have DBA in production
+3. **Audit Trail:** Enable auditing for admin activities
+4. **Regular Rotation:** Password rotation every 90 days
+
+### **Development Settings:**
+- DBA granted for development flexibility
+- Simple passwords for ease of testing
+- Local environment only (not exposed to network)
+
+## 📊 Performance Considerations
+
+### **Tablespace Strategy:**
+- **Separation:** Data and indexes in separate tablespaces for I/O optimization
+- **Autoextend:** Prevents out-of-space errors during data loading
+- **Sizing:** Initial sizes based on estimated Phase V data volume (100-500 records per table)
+
+### **Future Scalability:**
+1. **Add Tablespaces:** Separate tablespaces for different table types if needed
+2. **Partitioning:** Consider partitioning for large tables (>1M rows)
+3. **Compression:** Enable table compression for historical data
+
+## ✅ Verification Checklist
+
+### **Pre-Creation:**
+- [ ] Oracle XE 21c installed and running
+- [ ] SYSDBA access available
+- [ ] Sufficient disk space (minimum 1GB free)
+- [ ] Backup of existing databases if any
+
+### **Post-Creation Verification:**
+- [ ] PDB created and in OPEN state
+- [ ] All tablespaces created successfully
+- [ ] Users created with correct privileges
+- [ ] Quotas assigned properly
+- [ ] Connection possible with new users
+
+### **Documentation Complete:**
+- [ ] SQL scripts saved to GitHub
+- [ ] Screenshots captured
+- [ ] README.md updated
+- [ ] All configuration decisions documented
+
+## ⚠️ Known Limitations & Workarounds
+
+| Limitation | Reason | Workaround |
+|------------|--------|------------|
+| No archive logging | Oracle XE restriction | Regular RMAN backups |
+| Memory limits | XE 2GB total limit | Optimize SGA/PGA ratios |
+| No partitioning | XE feature restriction | Manual data archiving |
+| Single PDB | XE allows 3 PDBs total | Manage PDB count carefully |
+
+## 🚀 Next Phase Preparation
+
+### **Ready for Phase V:**
+1. **Database:** PDB created and configured
+2. **Users:** Application user with necessary privileges
+3. **Tablespaces:** Optimized for table creation and data loading
+4. **Documentation:** Complete for submission
+
+### **Connection Details for Phase V:**
+```
+Host: localhost
+Port: 1521
+Service: XE
+PDB: WED_27394_ENOCK_PDTAS_DB
+User: patient_track
+Password: humure
+```
+
+---
+
+**Phase:** IV - Database Creation  
+**Status:** ✅ Completed  
+**PDB:** WED_27394_ENOCK_PDTAS_DB  
+**Next Phase:** V - Table Implementation & Data Insertion  
+**Submission Ready:** SQL scripts + documentation + screenshots
 
 
 
