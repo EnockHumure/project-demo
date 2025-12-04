@@ -131,183 +131,131 @@ The Patient Disease Tracking & Analytics System follows a structured workflow fr
 
 ---
 
-**Phase:** III - Business Process Modeling  
+**Phase:** II - Business Process Modeling  
 **Focus:** Workflow design with analytics prioritization  
 
 
-# Phase III: Logical Database Design
+# Phase III: Logical Model Design
+
+## 🎯 Objective
+Design a detailed 3NF-compliant logical data model for the Patient Disease Tracking & Analytics System, ensuring data integrity and BI readiness.
 
 ## 📊 Entity-Relationship Model
 
-### **Entities and Descriptions**
+### **Entities (7 Tables)**
+| Entity | Description | PK | Key Attributes |
+|--------|-------------|----|----------------|
+| `reception` | Patient registration data | `patient_id` | Demographic info + disease classification |
+| `doctor` | Healthcare provider details | `doctor_id` | Doctor information + specialization |
+| `lab_technician` | Laboratory test results | `lab_test_id` | Test types, results, dates |
+| `treatment` | Medication administration | `treatment_id` | Medication, dosage, prescribing doctor |
+| `disease_stats` | Disease analytics fact table | `stats_id` | Case counts, trends, dates |
+| `main_diseases` | Priority diseases (5) | `disease_id` | Malaria, HIV/AIDS, Stunting, etc. |
+| `other_diseases` | Non-priority diseases | `other_disease_id` | Other conditions |
 
-| Entity | Purpose | Key Attributes |
-|--------|---------|----------------|
-| **reception** | Stores patient demographic information collected at registration | `patient_id` (PK), `first_name`, `last_name`, `gender`, `date_of_birth`, `phone_number`, `disease_name` |
-| **doctor** | Stores doctor information for diagnosis and treatment tracking | `doctor_id` (PK), `first_name`, `last_name`, `specialization` |
-| **lab_technician** | Records laboratory test results for patients | `lab_test_id` (PK), `patient_id` (FK), `test_type`, `test_result`, `test_date`, `lab_technician_name` |
-| **treatment** | Tracks medication and treatment provided to patients | `treatment_id` (PK), `patient_id` (FK), `medication`, `dosage`, `doctor_id` (FK), `date_given` |
-| **disease_stats** | Fact table for disease analytics and BI reporting | `stats_id` (PK), `disease_name` (FK), `total_cases`, `new_cases`, `date_recorded` |
-| **main_diseases** | Stores the 5 priority diseases for dashboard analytics | `disease_id` (PK), `disease_name` |
-| **other_diseases** | Stores diseases not in the main priority list | `other_disease_id` (PK), `disease_name`, `description` |
-
-### **Priority Diseases List**
-- Malaria
-- HIV/AIDS
-- Stunting
-- Respiratory Infections
-- Diarrheal Diseases
-
-## 🔗 Relationships & Cardinalities
-
+### **Cardinalities**
 ```
-1. One patient (reception) → Many lab tests (lab_technician) [1:N]
-2. One patient (reception) → Many treatments (treatment) [1:N]
-3. One disease (main_diseases) → Many statistics (disease_stats) [1:N]
-4. Doctors can prescribe multiple treatments [1:N]
-5. Diseases classified as either main or other (exclusive)
+reception (1) → (*) lab_technician
+reception (1) → (*) treatment
+doctor (1) → (*) treatment
+main_diseases (1) → (*) disease_stats
 ```
 
-## 🏗️ Database Normalization
+### **Constraints**
+- **PK/FK relationships** maintain referential integrity
+- **Check constraints** for data validation
+- **NOT NULL** for mandatory fields
+- **UNIQUE** for critical identifiers
 
-### **Third Normal Form (3NF) Compliance**
-- **1NF:** All tables have atomic values, no repeating groups
-- **2NF:** All non-key attributes fully dependent on primary keys
-- **3NF:** No transitive dependencies; non-key attributes depend only on PK
+## 🏗️ Normalization (3NF Compliance)
 
-### **Normalization Example:**
-```
-Original denormalized: reception(patient_id, disease_name, disease_description)
-Normalized to:
-  - reception(patient_id, disease_name) [disease_name as FK reference]
-  - main_diseases(disease_id, disease_name, description) OR
-  - other_diseases(other_disease_id, disease_name, description)
-```
+### **1NF - Atomic Values**
+- Each table cell contains single values
+- No repeating groups or arrays
+- Example: `medication` stored as separate text, not comma-separated list
+
+### **2NF - No Partial Dependencies**
+- All non-key attributes depend on entire primary key
+- Example: In `treatment`, all attributes depend on `treatment_id` (not just `patient_id`)
+
+### **3NF - No Transitive Dependencies**
+- Non-key attributes depend only on primary key
+- Example: Disease description moved to disease tables, not duplicated in `reception`
 
 ## 📋 Data Dictionary
 
-| Table | Description | Primary Key | Foreign Keys |
-|-------|-------------|-------------|--------------|
-| **reception** | Patient demographic and registration data | `patient_id` | - |
-| **doctor** | Healthcare provider information | `doctor_id` | - |
-| **lab_technician** | Laboratory test results and metadata | `lab_test_id` | `patient_id` → reception |
-| **treatment** | Medication and treatment records | `treatment_id` | `patient_id` → reception, `doctor_id` → doctor |
-| **disease_stats** | Aggregated disease metrics for analytics | `stats_id` | `disease_name` → main_diseases |
-| **main_diseases** | Priority disease definitions | `disease_id` | - |
-| **other_diseases** | Non-priority disease definitions | `other_disease_id` | - |
+| Table | PK | FK | Key Columns | Data Types |
+|-------|----|----|-------------|------------|
+| reception | patient_id | - | first_name, gender, disease_name | VARCHAR2, DATE, VARCHAR2 |
+| doctor | doctor_id | - | specialization, last_name | VARCHAR2 |
+| lab_technician | lab_test_id | patient_id | test_type, test_result | VARCHAR2, VARCHAR2 |
+| treatment | treatment_id | patient_id, doctor_id | medication, dosage, date_given | VARCHAR2, VARCHAR2, DATE |
+| disease_stats | stats_id | disease_name | total_cases, date_recorded | NUMBER, DATE |
+| main_diseases | disease_id | - | disease_name | VARCHAR2 |
+| other_diseases | other_disease_id | - | disease_name, description | VARCHAR2, VARCHAR2 |
 
-## 📈 BI-Optimized Schema Design
+## 📈 BI Considerations
 
-### **Fact Table:**
-- **disease_stats** - Central analytics table tracking disease metrics over time
+### **Fact vs Dimension Tables**
+- **Fact Table:** `disease_stats` (measures: total_cases, new_cases)
+- **Dimension Tables:** `reception`, `doctor`, `lab_technician`, `treatment`, `main_diseases`
 
-### **Dimension Tables:**
-- **reception** - Patient dimension
-- **doctor** - Provider dimension  
-- **lab_technician** - Test dimension
-- **treatment** - Treatment dimension
-- **main_diseases** - Disease classification dimension
+### **Slowly Changing Dimensions**
+- **Type 1 (Overwrite):** Doctor specialization changes
+- **Type 2 (Historical):** Patient disease classification changes
+- **Type 3 (Limited History):** Disease priority status changes
 
-### **Analytics Ready Features:**
-- Star schema design for efficient queries
-- Pre-aggregated metrics in `disease_stats`
-- Time-series data for trend analysis
-- Dimensional hierarchies for drill-down reporting
+### **Aggregation Levels**
+- **Daily:** New case counts
+- **Weekly/Monthly:** Trend analysis
+- **Yearly:** Public health reporting
+- **Roll-up:** Disease → Category → System-wide
 
-## 🎯 ER Diagram (Text-Based)
+### **Audit Trail Design**
+- Separate `audit_log` table (Phase VII)
+- Track: user, action, table, record_id, timestamp
+- Support rollback and compliance reporting
 
-```
-    +----------------+           +----------------+           +----------------+
-    |   reception    |1         *|  lab_technician|*         1|     doctor     |
-    +----------------+-----------+----------------+-----------+----------------+
-    | patient_id PK  |           | lab_test_id PK |           | doctor_id PK   |
-    | first_name     |           | patient_id FK  |           | first_name     |
-    | last_name      |           | test_type      |           | last_name      |
-    | gender         |           | test_result    |           | specialization |
-    | date_of_birth  |           | test_date      |           +----------------+
-    | phone_number   |           | lab_technician_name|      
-    | disease_name   |           +----------------+
-    +----------------+       
+## 🔧 Design Assumptions
 
-           |1
-           |
-           * 
-    +----------------+
-    |    treatment   |
-    +----------------+
-    | treatment_id PK|
-    | patient_id FK  |
-    | medication     |
-    | dosage         |
-    | doctor_id FK   |
-    | date_given     |
-    +----------------+
+1. **Data Volume:** 100-500 patients per main table
+2. **Concurrency:** Multiple concurrent users (reception, doctors, lab)
+3. **Retention:** 5+ years of historical data
+4. **Performance:** Sub-second response for dashboard queries
+5. **Security:** Role-based access control (Phase VII)
 
-           |
-           * 
-    +----------------+
-    |  disease_stats |
-    +----------------+
-    | stats_id PK    |
-    | disease_name FK|
-    | total_cases    |
-    | new_cases      |
-    | date_recorded  |
-    +----------------+
+## 🎯 ER Diagram (Mermaid Format)
 
-           |
-           * 
-    +----------------+          +----------------+
-    | main_diseases  |          | other_diseases |
-    +----------------+          +----------------+
-    | disease_id PK  |          | other_disease_id PK |
-    | disease_name   |          | disease_name        |
-    +----------------+          | description         |
-                                +----------------+
+```mermaid
+erDiagram
+    RECEPTION ||--o{ LAB_TECHNICIAN : "receives_tests"
+    RECEPTION ||--o{ TREATMENT : "receives_treatment"
+    DOCTOR ||--o{ TREATMENT : "prescribes"
+    MAIN_DISEASES ||--o{ DISEASE_STATS : "tracked_in"
+    RECEPTION }o--|| MAIN_DISEASES : "classified_as_main"
+    RECEPTION }o--|| OTHER_DISEASES : "classified_as_other"
 ```
 
-## 🔄 Data Flow Architecture
+## 📊 Schema Summary
 
 ```
-Patient Registration → Disease Classification → Clinical Process → Analytics
-      (reception)          (main/other)      (doctor/lab/treatment)  (disease_stats)
+TOTAL TABLES: 7
+TOTAL RELATIONSHIPS: 6
+NORMALIZATION LEVEL: 3NF
+BI READINESS: Star schema implemented
+AUDIT READINESS: Audit trail framework defined
 ```
 
-## 🛡️ Data Integrity Constraints
 
-### **Primary Keys:**
-- Unique identifiers for all entities
-- Auto-increment sequences for surrogate keys
 
-### **Foreign Keys:**
-- Enforce referential integrity between related tables
-- Cascade updates for consistency
-- Restrict deletes to prevent orphan records
 
-### **Check Constraints:**
-- Valid gender values (M/F/O)
-- Date ranges (no future dates for birth/visit)
-- Positive values for numeric fields
-
-## 📊 Design Justification
-
-### **Why Separate Main/Other Diseases?**
-1. **Analytics Focus:** Prioritize resources on major public health concerns
-2. **Performance:** Efficient queries for priority diseases
-3. **Scalability:** Easy to modify disease priority lists
-4. **Clarity:** Clear separation for reporting purposes
-
-### **Why disease_stats Fact Table?**
-1. **BI Optimization:** Pre-aggregated metrics for fast dashboards
-2. **Historical Tracking:** Time-series disease trends
-3. **Reduced Query Complexity:** Simplified analytics queries
-4. **Consistency:** Single source of truth for disease metrics
 
 ---
 
-**Phase:** III - Logical Database Design  
-**Status:** 3NF Compliant, BI-Optimized  
-
+**Phase:** III - Logical Model Design  
+**Status:** ✅ Completed  
+**Compliance:** 3NF + BI Optimized  
+**Next Phase:** IV - Database Creation (PDB + Tablespaces)
 
 
 
