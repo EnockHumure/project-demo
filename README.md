@@ -161,6 +161,19 @@ doctor (1) → (*) treatment
 main_diseases (1) → (*) disease_stats
 ```
 
+
+## 🎯 ER Diagram (Mermaid Format)
+
+```mermaid
+erDiagram
+    RECEPTION ||--o{ LAB_TECHNICIAN : "receives_tests"
+    RECEPTION ||--o{ TREATMENT : "receives_treatment"
+    DOCTOR ||--o{ TREATMENT : "prescribes"
+    MAIN_DISEASES ||--o{ DISEASE_STATS : "tracked_in"
+    RECEPTION }o--|| MAIN_DISEASES : "classified_as_main"
+    RECEPTION }o--|| OTHER_DISEASES : "classified_as_other"
+```
+
 ### **Constraints**
 - **PK/FK relationships** maintain referential integrity
 - **Check constraints** for data validation
@@ -224,17 +237,6 @@ main_diseases (1) → (*) disease_stats
 4. **Performance:** Sub-second response for dashboard queries
 5. **Security:** Role-based access control (Phase VII)
 
-## 🎯 ER Diagram (Mermaid Format)
-
-```mermaid
-erDiagram
-    RECEPTION ||--o{ LAB_TECHNICIAN : "receives_tests"
-    RECEPTION ||--o{ TREATMENT : "receives_treatment"
-    DOCTOR ||--o{ TREATMENT : "prescribes"
-    MAIN_DISEASES ||--o{ DISEASE_STATS : "tracked_in"
-    RECEPTION }o--|| MAIN_DISEASES : "classified_as_main"
-    RECEPTION }o--|| OTHER_DISEASES : "classified_as_other"
-```
 
 ## 📊 Schema Summary
 
