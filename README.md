@@ -71,7 +71,7 @@ This is a multi-phase individual capstone project centered on Oracle database de
 | VIII | Final Documentation | GitHub Repo + Presentation |
 
 
-# Phase III: Business Process Modeling
+# Phase II: Business Process Modeling
 
 ## 📋 Business Process Overview
 The Patient Disease Tracking & Analytics System follows a structured workflow from patient arrival to analytics generation, with special focus on disease classification for prioritized analytics.
