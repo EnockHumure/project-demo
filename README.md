@@ -12,50 +12,7 @@
 **Group:** Wednesday(C)  
 **Project Title:** Patient Disease Tracking & Analytics System (PDTAS)
 
-## 🏥 Project Overview
 
-This is a multi-phase individual capstone project centered on Oracle database design, PL/SQL development, and Business Intelligence implementation. The project serves as the FINAL EXAM and significantly impacts the course grade.
-
-## 🔍 Problem Analysis
-
-**Current Challenge:** Healthcare providers lack a unified system to track patient flows and disease-specific outcomes across reception, clinical, and lab departments. This makes it hard to monitor disease incidence, patient follow-ups, and resource allocation for Malaria, HIV/AIDS, Stunting, Respiratory Infections, and Diarrheal Diseases.
-
-**Research Question:** Can we predict workplace injury patterns? (Note: This appears to be from a different project - maintaining original text)
-
-## 🛠 Solution Architecture
-
-**System Solution:** A PL/SQL-backed Patient Tracking System that records patient registration, clinical encounters, diagnostics and treatments and produces BI-ready data for disease surveillance and decision-making.
-
-## 🏛 Implementation Context
-
-**Usage Environment:** Used in hospital outpatient departments and clinics to capture patient identity, visit lifecycle (reception → clinician → lab → treatment → follow-up) and disease-specific details.
-
-**Target User Groups:**
-- Receptionists
-- Doctors  
-- Lab Technicians
-- Pharmacists
-- Hospital Managers
-- Public Health Analysts
-
-## 🎯 Project Objectives
-
-**Primary Goals:**
-- Accurate patient tracking
-- Audit trail of all actions
-- Disease incidence reports
-- KPI dashboards (incidence rates, treatment outcomes, no-show rates)
-
-## 📊 Business Intelligence Potential
-
-**Analytics Capabilities:**
-- Dashboards for disease trends
-- Hotspots identification
-- Age/sex distributions analysis
-- Treatment success monitoring
-- Resource usage optimization
-
-## 📚 Development Framework
 
 ### **Project Phases table of content **
 
@@ -69,6 +26,23 @@ This is a multi-phase individual capstone project centered on Oracle database de
 | VI | PL/SQL Development | Procedures, Functions, Packages |
 | VII | Advanced Programming | Triggers, Auditing, Security |
 | VIII | Final Documentation | GitHub Repo + Presentation |
+
+# **Phase:** Problem Identification
+## 🏥 Project Overview
+
+This is a multi-phase individual capstone project centered on Oracle database design, PL/SQL development, and Business Intelligence implementation. 
+
+## 🔍 Problem Analysis
+
+**Current Challenge:** Healthcare providers lack a unified system to track patient flows and disease-specific outcomes across reception, clinical, and lab departments. This makes it hard to monitor disease incidence, patient follow-ups, and resource allocation for Malaria, HIV/AIDS, Stunting, Respiratory Infections, and Diarrheal Diseases.
+
+**Research Question:** Can we predict workplace injury patterns? (Note: This appears to be from a different project - maintaining original text)
+
+## 🛠 Solution Architecture 
+
+**System Solution:** A PL/SQL-based Patient Tracking System that records patient information, monitors how diseases are spreading across the country, and tracks how each disease is being treated.
+
+## 🏛 Implementation Context
 
 
 # Phase II: Business Process Modeling
@@ -131,7 +105,6 @@ The Patient Disease Tracking & Analytics System follows a structured workflow fr
 
 ---
 
-**Phase:** II - Business Process Modeling  
 **Focus:** Workflow design with analytics prioritization  
 
 
@@ -255,10 +228,10 @@ AUDIT READINESS: Audit trail framework defined
 ---
 
 **Phase:** III - Logical Model Design  
-**Status:** ✅ Completed  
+**Status:** ✅ Completed   
 **Compliance:** 3NF + BI Optimized  
 
-# Phase IV: Database Creation
+  # Phase IV: Database Creation
 
 ## 🎯 Objective
 Create and configure the Oracle pluggable database for the Patient Disease Tracking & Analytics System with proper tablespace management and user setup.
@@ -266,12 +239,10 @@ Create and configure the Oracle pluggable database for the Patient Disease Track
 ## 📁 Database Setup
 
 ### **Naming Convention (As Required)**
-- **Group:** Wednesday (WED)
-- **Student ID:** 27394
-- **First Name:** Enock
-- **Project Name:** Patient Disease Tracking & Analytics System (PDTAS)
 
 **Final PDB Name:** `WED_27394_ENOCK_PDTAS_DB`
+
+- **Project Name:** Patient Disease Tracking & Analytics System (PDTAS)
 
 ### **Administrative Configuration**
 | Component | Value | Purpose |
@@ -285,18 +256,13 @@ Create and configure the Oracle pluggable database for the Patient Disease Track
 ## ⚙️ Database Configuration
 
 ### **Tablespace Configuration**
+
 | Tablespace | Type | Size | Autoextend | Purpose |
 |------------|------|------|------------|---------|
 | `pdta_data` | Data | 50MB | ON (Next 10M, Max 500M) | Stores all table data |
 | `pdta_index` | Index | 20MB | ON (Next 5M, Max 200M) | Stores indexes for performance |
 | `pdta_temp` | Temporary | 20MB | ON (Next 5M, Max 100M) | Temporary operations space |
 
-### **Memory Parameters**
-| Parameter | Value | Justification |
-|-----------|-------|---------------|
-| **SGA** | Oracle XE Default | Limited by Oracle Express Edition |
-| **PGA** | Oracle XE Default | Limited by Oracle Express Edition |
-| **Total Memory** | As per XE limits | 2GB total for Oracle XE 21c |
 
 **Note:** Oracle Express Edition has memory limitations. Production deployment would require tuning.
 
@@ -315,11 +281,8 @@ WORKAROUND: Regular backups via RMAN or data export
 ## 📜 SQL Implementation Scripts
 
 ### **1. Database Creation Script (`phase4_create_pdb.sql`)**
+
 ```sql
--- Phase IV: Database Creation for PDTAS
--- Student: Humure Enock (ID: 27394)
--- Group: Wednesday (C)
--- Date: December 2024
 
 -- Step 1: Create Pluggable Database
 CREATE PLUGGABLE DATABASE WED_27394_ENOCK_PDTAS_DB
@@ -365,6 +328,7 @@ SELECT username, account_status FROM dba_users;
 ```
 
 ### **2. Verification Script (`phase4_verify.sql`)**
+
 ```sql
 -- Verify PDB Status
 SELECT name, open_mode, con_id FROM v$pdbs WHERE name = 'WED_27394_ENOCK_PDTAS_DB';
@@ -388,6 +352,7 @@ WHERE tablespace_name LIKE 'PDTA%';
 ## 👥 User Setup Documentation
 
 ### **Administrative User (`enock_admin`)**
+
 ```sql
 -- Privileges: Full DBA rights
 -- Purpose: Database administration, user management, backup/restore
@@ -500,7 +465,6 @@ Verify the successful creation of all database tables, data integrity, and prope
 | `TREATMENT` | Medication and treatment history | 5 |
 | `DISEASE_STATS` | Analytics and disease metrics | 5 |
 
-## 🔍 Validation Script Results
 
 ### **1. Table Existence Check**
 ```sql
@@ -563,7 +527,7 @@ WHERE NOT EXISTS (
 ```
 **Expected Result:** 0 rows (no orphan records)
 
-### **2. Orphan Treatment Records Check**
+### **2.Treatment Records Check**
 ```sql
 SELECT *
 FROM treatment t
@@ -571,6 +535,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM reception r WHERE r.patient_id = t.patient_id
 );
 ```
+
 **Expected Result:** 0 rows (no orphan records)
 
 ## 📊 Sample Data Queries
@@ -655,30 +620,16 @@ ORDER BY patient_count DESC;
 -- Expected: List of main diseases sorted by number of patients
 ```
 
-## ✅ Validation Summary
-
-### **Pass/Fail Criteria:**
-- [ ] **Table Creation:** All 7 tables exist
-- [ ] **Data Insertion:** All tables have sample data (5 rows each minimum)
-- [ ] **Foreign Keys:** No orphan records found
-- [ ] **Basic Queries:** All SELECT queries return expected results
-- [ ] **JOIN Operations:** All joins work correctly
-- [ ] **Aggregations:** GROUP BY queries calculate correctly
-- [ ] **Subqueries:** Complex queries execute without errors
-
 ### **Execution Instructions:**
 1. Connect to the PDB: `WED_27394_ENOCK_PDTAS_DB`
 2. Run as user: `patient_track`
-3. Execute the validation script in SQL Developer or SQL*Plus
-4. Verify all expected results match
 
-## 📁 Files for Submission
 
 ### **Phase V Scripts:**
+
 - `phase5_create_tables.sql` - Table creation script
 - `phase5_insert_data.sql` - Data insertion script
 - `phase5_validation.sql` - This validation script
-- `README.md` - This documentation
 
 ### **Expected Output Files:**
 - Screenshot of table creation success
@@ -691,10 +642,7 @@ ORDER BY patient_count DESC;
 **Phase:** V - Table Implementation & Data Insertion  
 **Status:** ✅ Completed  
 **Database:** WED_27394_ENOCK_PDTAS_DB  
-**User:** patient_track  
-**Next Phase:** VI - PL/SQL Development
-
-
+**User:** patient_track
 
 
 # Phase VI: PL/SQL Development & Testing
@@ -878,7 +826,7 @@ LEAD(visit_date) OVER (ORDER BY visit_date) AS next_visit
 - ✅ Proper return types and error handling
 - ✅ Business logic integration
 
-### **Advanced Features:**
+### **cursor:**
 - ✅ Explicit cursors with OPEN/FETCH/CLOSE
 - ✅ Window functions (ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD)
 - ✅ Package with specification and body
@@ -900,10 +848,6 @@ LEAD(visit_date) OVER (ORDER BY visit_date) AS next_visit
 - `phase6_tests.sql` - Complete test script
 - `phase6_validation.sql` - Validation queries
 
-### **Documentation:**
-- `README.md` - This documentation
-- `test_results.md` - Complete test results
-- `error_logs_sample.txt` - Sample error logs
 
 ### **Screenshots:**
 - Package compilation success
@@ -1153,7 +1097,7 @@ END;
 
 ---
 
-### ❌ Test 1 — Insert on Weekday (Should FAIL)
+###  Test 1 — Insert on Weekday (Should FAIL)
 
 ```sql
 INSERT INTO reception (first_name, last_name, gender, date_of_birth, phone_number, disease_name)
@@ -1218,43 +1162,13 @@ ORDER BY action_time DESC;
 
 ---
 
-# 🎉 **PHASE VII IS COMPLETE**
-
-Everything:
-
-✔ Holidays
-✔ Audit Table
-✔ Audit Procedure
-✔ Restriction Function
-✔ Secure Trigger
-✔ Compound Trigger
-✔ Worked Tests
-✔ No invalid datatypes
-✔ No errors in triggers
-
----
-
-If you want, I can now prepare:
-
-✅ Full final integrated `.sql` file
-OR
-✅ Phase VIII documentation
-OR
-✅ GitHub README
-
-Just tell me **"coach do Phase VIII"** or **"generate final SQL"**.
-
-
-
-
-
 
 
 ## 📋 Delivery Requirements
 
 **Course Details:**  
 - **Course:** Database Development with PL/SQL (INSY 8311)  
-- **Academic Year:** 2025-2026 | Semester: I  
+- **Academic Year:** 2025-2026 | Semester: I 
 - **Institution:** Adventist University of Central Africa (AUCA)  
 - **Project Completion Date:** December 7, 2025
 
