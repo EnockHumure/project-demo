@@ -1,6 +1,6 @@
 # Patient Disease Tracking & Analytics System (PDTAS)
 
-=============================================================
+======================================================================
 ## 🎓 Personal Information
 
 **Student:** Humure Enock  
