@@ -5,7 +5,7 @@
 
 **Student:** Humure Enock  
 **ID:** 27394  
-**Program:** AUCA - IT - Software Engineering  
+**Program:** AUCA - IT -Software Engineering  
 **Course:** INSY 8311 | Database Development with PL/SQL  
 **Faculty:** Information Technology - AUCA  
 **Lecturer:** Eric Maniraguha  
